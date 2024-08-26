@@ -1,12 +1,41 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/logo.svg";
+import { RegisterUser } from "../apicalls/users";
+import StatusComponent from "../components/StatusComponent";
 
 const Register = () => {
-  const showStatus = () => {
-    alert("User Registered Successfully.");
+  const [loginStatus, setLoginStatus] = useState(false);
+  const [status, setStatus] = useState({});
+
+  const nameRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
+  const registerForm = async (e) => {
+    e.preventDefault();
+    const res = await RegisterUser({
+      name: nameRef.current?.value,
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+    });
+    if (res) {
+      setLoginStatus(true);
+      setStatus(res);
+    }
+    console.log(res);
   };
+
+  useEffect(() => {
+    if (loginStatus) {
+      setTimeout(() => {
+        setLoginStatus(false);
+      }, 4000);
+    }
+  }, [loginStatus]);
+
   return (
-    <>
+    <div className="w-screen h-screen">
+      {loginStatus ? <StatusComponent status={status} /> : null}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-slate-400">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img className="mx-auto h-10 w-auto" src={logo} alt="Your Company" />
@@ -18,8 +47,8 @@ const Register = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form
             className="space-y-6"
-            action="#"
-            onSubmit={showStatus}
+            // action="#"
+            onSubmit={registerForm}
             // method="POST"
           >
             <div>
@@ -33,6 +62,7 @@ const Register = () => {
                 <input
                   id="username"
                   name="username"
+                  ref={nameRef}
                   type="text"
                   placeholder="Akshay"
                   required
@@ -52,6 +82,7 @@ const Register = () => {
                   id="email"
                   name="email"
                   type="email"
+                  ref={emailRef}
                   autoComplete="email"
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
@@ -80,6 +111,7 @@ const Register = () => {
                   id="password"
                   name="password"
                   type="password"
+                  ref={passwordRef}
                   autoComplete="current-password"
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-2"
@@ -107,7 +139,7 @@ const Register = () => {
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
